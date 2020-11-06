@@ -4,5 +4,5 @@
 
 # Captura de telas do funcionamento dos microserviços com filas em RabbitMQ
 
-![](https://github.com/tralljf/avancadev/images/Captura_1.png)
-![](https://github.com/tralljf/avancadev/images/Captura_2.png)
+![](https://github.com/tralljf/avancadev/blob/master/images/Captura_1.png)
+![](https://github.com/tralljf/avancadev/blob/master/images/Captura_2.png)
