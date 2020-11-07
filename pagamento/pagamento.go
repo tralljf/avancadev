@@ -68,7 +68,7 @@ func process(msg amqp.Delivery) {
 	order := NewOrder()
 
 	json.Unmarshal(msg.Body, &order)
-	resultCoupon := makeHttpCall("http://localhost:9092/", order.Coupon)
+	resultCoupon := makeHttpCall("http://micro-servico-coupon:9092/", order.Coupon)
 
 
 	switch resultCoupon.Status {

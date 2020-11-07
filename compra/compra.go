@@ -61,14 +61,15 @@ func process(w http.ResponseWriter, r *http.Request){
 	defer ch.Close()
 
 	err = rabbitMQ.Notify(string(jsonOrder), "application/json", "orders_ex", "")
-
+	t := template.Must(template.ParseFiles("templates/process.html"))
+	
 	if err != nil {
-		log.Fatal("Erro ao adicionar a fila")
+		t.Execute(w, "Microserviço não conseguiu conectar na fila")	
+		// log.Fatal("Erro ao adicionar a fila")
 	}
 
 	// result := makeHttpCall("http://localhost:9091", r.FormValue("coupon"), r.FormValue("cc-number"))
 
-	t := template.Must(template.ParseFiles("templates/process.html"))
 	t.Execute(w, "")
 }
 

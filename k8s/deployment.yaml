@@ -1,0 +1,157 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservico-compra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservico-compra
+  template:
+    metadata:
+      labels:
+        app: microservico-compra
+    spec:
+      containers:
+        - name: microservico-compra
+          image: thiagorabelojf/avancadev-mircoservice-1
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 9090
+          envFrom:
+            - configMapRef:
+                name: microservico-conf
+          volumeMounts:
+            - name: microservico-conf
+              subPath: .env
+              mountPath: /go/src/.env
+
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: microservico-secret
+                  key: RABBITMQ_DEFAULT_USER
+
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: microservico-secret
+                  key: RABBITMQ_DEFAULT_PASS
+
+      volumes:
+        - name: microservico-conf
+          configMap:
+            name: microservico-conf
+            items:
+              - key: env
+                path: .env
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micro-servico-pagamento
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: micro-servico-pagamento
+  template:
+    metadata:
+      labels:
+        app: micro-servico-pagamento
+    spec:
+      containers:
+        - name: micro-servico-pagamento
+          image: thiagorabelojf/avancadev-mircoservice-2:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+          envFrom:
+            - configMapRef:
+                name: microservico-conf
+          volumeMounts:
+            - name: microservico-conf
+              subPath: .env
+              mountPath: /go/src/.env
+
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: microservico-secret
+                  key: RABBITMQ_DEFAULT_USER
+
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: microservico-secret
+                  key: RABBITMQ_DEFAULT_PASS
+
+      volumes:
+        - name: microservico-conf
+          configMap:
+            name: microservico-conf
+            items:
+              - key: env
+                path: .env
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: micro-servico-coupon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: micro-servico-coupon
+  template:
+    metadata:
+      labels:
+        app: micro-servico-coupon
+    spec:
+      containers:
+        - name: micro-servico-coupon
+          image: thiagorabelojf/avancadev-mircoservice-3:lates
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 9092
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: "rabbitmq:3-management"
+          ports:
+            - containerPort: 15672
+            - containerPort: 5672
+          env:
+            - name: RABBITMQ_ERLANG_COOKIE
+              value: "SWQOKODSQALRPCLNMEQG"
+            - name: RABBITMQ_DEFAULT_USER
+              value: "rabbitmq"
+            - name: RABBITMQ_DEFAULT_PASS
+              value: "rabbitmq"
+            - name: RABBITMQ_DEFAULT_VHOST
+              value: "/"
